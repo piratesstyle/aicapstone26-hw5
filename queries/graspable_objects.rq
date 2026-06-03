@@ -1,0 +1,21 @@
+PREFIX cap: <https://hcis.io/ontology/aicapstone/2026/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?obj ?name ?objectLabel ?role
+WHERE {
+    ?obj rdf:type cap:GraspableObject .
+
+    OPTIONAL {
+        ?obj rdfs:label ?name .
+    }
+
+    OPTIONAL {
+        ?obj cap:hasObjectLabel ?objectLabel .
+    }
+
+    OPTIONAL {
+        ?obj cap:hasTaskRole ?role .
+    }
+}
+ORDER BY ?obj

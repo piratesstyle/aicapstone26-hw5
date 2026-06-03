@@ -1,0 +1,315 @@
+@prefix cap: <https://hcis.io/ontology/aicapstone/2026/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix g12: <https://hcis.io/ontology/aicapstone/2026/group12/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://hcis.io/ontology/aicapstone/2026> a owl:Ontology ;
+    rdfs:label "AI Capstone 2026 Course Ontology"@en ;
+    dcterms:created "2026-05-22"^^xsd:date ;
+    dcterms:creator cap:ccyont ;
+    dcterms:description "This ontology defines a compact course vocabulary for representing physical task objects, task roles, manipulation affordances, grounding identifiers, and inferable graspability in the AI Capstone 2026 Physical AI project."@en ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:title "AI Capstone 2026 Course Ontology"@en ;
+    vann:preferredNamespacePrefix "cap" ;
+    vann:preferredNamespaceUri "https://hcis.io/ontology/aicapstone/2026/" ;
+    rdfs:comment "A reduced educational ontology profile for semantic and affordance grounding of graspable objects in the AI Capstone 2026 course project."@en .
+
+cap:Cup a owl:Class ;
+    rdfs:label "cup"@en ;
+    rdfs:comment "A container-like object used in the cup-stacking task."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty cap:hasAffordance ;
+            owl:someValuesFrom cap:GraspingAffordance ],
+        [ a owl:Restriction ;
+            owl:onProperty cap:hasAffordance ;
+            owl:someValuesFrom cap:StackabilityAffordance ],
+        cap:PhysicalObject .
+
+cap:Fork a owl:Class ;
+    rdfs:label "fork"@en ;
+    rdfs:comment "A cutlery object to be placed in the cutlery-arrangement task."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty cap:hasAffordance ;
+            owl:someValuesFrom cap:GraspingAffordance ],
+        cap:PhysicalObject .
+
+cap:Knife a owl:Class ;
+    rdfs:label "knife"@en ;
+    rdfs:comment "A cutlery object to be placed in the cutlery-arrangement task."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty cap:hasAffordance ;
+            owl:someValuesFrom cap:GraspingAffordance ],
+        cap:PhysicalObject .
+
+cap:ManipulationTask a owl:Class ;
+    rdfs:label "manipulation task"@en ;
+    rdfs:comment "A task in which a robot changes the pose, state, or arrangement of physical objects."@en ;
+    rdfs:subClassOf cap:Task .
+
+cap:Plate a owl:Class ;
+    rdfs:label "plate"@en ;
+    rdfs:comment "A reference object used for arranging cutlery in the cutlery-arrangement task."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty cap:hasAffordance ;
+            owl:someValuesFrom cap:SupportAffordance ],
+        cap:PhysicalObject .
+
+cap:ReferenceObject a owl:Class ;
+    rdfs:label "reference object"@en ;
+    rdfs:comment "A task role for an object used as a spatial or semantic reference for arranging other objects."@en ;
+    rdfs:subClassOf cap:TaskRole .
+
+cap:RobotAgent a owl:Class ;
+    rdfs:label "robot agent"@en ;
+    rdfs:comment "A robot or robot-controlled agent that can perceive objects, reason over the ontology, and act in the task environment."@en .
+
+cap:TargetObject a owl:Class ;
+    rdfs:label "target object"@en ;
+    rdfs:comment "A task role for an object that is directly acted upon or manipulated."@en ;
+    rdfs:subClassOf cap:TaskRole .
+
+cap:canBeManipulatedBy a owl:ObjectProperty ;
+    rdfs:label "can be manipulated by"@en ;
+    rdfs:comment "Relates a physical object to an end effector capable of manipulating it."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range cap:EndEffector .
+
+g12:LevelQualifiedObject a owl:Class ;
+    rdfs:label "level-qualified object"@en ;
+    rdfs:comment "A physical object that is associated with at least one task level in the Group 12 task setting."@en ;
+    rdfs:subClassOf cap:PhysicalObject ;
+    owl:equivalentClass [ a owl:Class ;
+            owl:intersectionOf ( cap:PhysicalObject [ a owl:Restriction ;
+                        owl:onProperty g12:hasTaskLevel ;
+                        owl:someValuesFrom g12:TaskLevel ] ) ] .
+
+g12:blueBasket01 a cap:Basket ;
+    rdfs:label "blue basket 01"@en ;
+    rdfs:comment "A blue basket used as a container target in the advanced-level toy-block collection task."@en ;
+    g12:hasSimulationName "BlueBasket" ;
+    g12:hasTaskLevel g12:AdvancedLevel ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasColor "blue" ;
+    cap:hasObjectLabel "BlueBasket" ;
+    cap:hasPoseFrame "world/object_blue_basket" ;
+    cap:hasTaskRole cap:ContainerTarget .
+
+g12:blueToyBlock01 a cap:GraspableObject,
+        cap:ToyBlock ;
+    rdfs:label "blue toy block 01"@en ;
+    rdfs:comment "A blue toy block used as a collectable object in both entry-level and advanced-level toy-block collection tasks."@en ;
+    g12:hasSimulationName "BlueToyBlock" ;
+    g12:hasTaskLevel g12:AdvancedLevel,
+        g12:EntryLevel ;
+    cap:hasAffordance cap:GraspingAffordance ;
+    cap:hasColor "blue" ;
+    cap:hasObjectLabel "BlueToyBlock" ;
+    cap:hasPoseFrame "world/object_blue_toy_block" ;
+    cap:hasTaskRole cap:CollectableObject .
+
+g12:greenBasket01 a cap:Basket ;
+    rdfs:label "green basket 01"@en ;
+    rdfs:comment "A green basket used as a container target in the advanced-level toy-block collection task."@en ;
+    g12:hasSimulationName "GreenBasket" ;
+    g12:hasTaskLevel g12:AdvancedLevel ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasColor "green" ;
+    cap:hasObjectLabel "GreenBasket" ;
+    cap:hasPoseFrame "world/object_green_basket" ;
+    cap:hasTaskRole cap:ContainerTarget .
+
+g12:greenToyBlock01 a cap:GraspableObject,
+        cap:ToyBlock ;
+    rdfs:label "green toy block 01"@en ;
+    rdfs:comment "A green toy block used as a collectable object in both entry-level and advanced-level toy-block collection tasks."@en ;
+    g12:hasSimulationName "GreenToyBlock" ;
+    g12:hasTaskLevel g12:AdvancedLevel,
+        g12:EntryLevel ;
+    cap:hasAffordance cap:GraspingAffordance ;
+    cap:hasColor "green" ;
+    cap:hasObjectLabel "GreenToyBlock" ;
+    cap:hasPoseFrame "world/object_green_toy_block" ;
+    cap:hasTaskRole cap:CollectableObject .
+
+g12:hasSimulationName a owl:DatatypeProperty ;
+    rdfs:label "has simulation name"@en ;
+    rdfs:comment "Records the object name used in the group's simulation or data collection environment."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range xsd:string .
+
+g12:redBasket01 a cap:Basket ;
+    rdfs:label "red basket 01"@en ;
+    rdfs:comment "A red basket used as a container target in the advanced-level toy-block collection task."@en ;
+    g12:hasSimulationName "RedBasket" ;
+    g12:hasTaskLevel g12:AdvancedLevel ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasColor "red" ;
+    cap:hasObjectLabel "RedBasket" ;
+    cap:hasPoseFrame "world/object_red_basket" ;
+    cap:hasTaskRole cap:ContainerTarget .
+
+g12:redToyBlock01 a cap:GraspableObject,
+        cap:ToyBlock ;
+    rdfs:label "red toy block 01"@en ;
+    rdfs:comment "A red toy block used as a collectable object in both entry-level and advanced-level toy-block collection tasks."@en ;
+    g12:hasSimulationName "RedToyBlock" ;
+    g12:hasTaskLevel g12:AdvancedLevel,
+        g12:EntryLevel ;
+    cap:hasAffordance cap:GraspingAffordance ;
+    cap:hasColor "red" ;
+    cap:hasObjectLabel "RedToyBlock" ;
+    cap:hasPoseFrame "world/object_red_toy_block" ;
+    cap:hasTaskRole cap:CollectableObject .
+
+g12:whiteBasket01 a cap:Basket ;
+    rdfs:label "white basket 01"@en ;
+    rdfs:comment "A white basket used as the container target in the entry-level toy-block collection task."@en ;
+    g12:hasSimulationName "WhiteBasket" ;
+    g12:hasTaskLevel g12:EntryLevel ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasColor "white" ;
+    cap:hasObjectLabel "WhiteBasket" ;
+    cap:hasPoseFrame "world/object_white_basket" ;
+    cap:hasTaskRole cap:ContainerTarget .
+
+cap:hasApproxWidth a owl:DatatypeProperty ;
+    rdfs:label "has approximate width"@en ;
+    rdfs:comment "Records an approximate object width, which may be useful for checking whether an object fits within a gripper capability."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range xsd:decimal .
+
+cap:hasColor a owl:DatatypeProperty ;
+    rdfs:label "has color"@en ;
+    rdfs:comment "Records the perceived or assigned color of a physical object."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range xsd:string .
+
+cap:hasObjectLabel a owl:DatatypeProperty ;
+    rdfs:label "has object label"@en ;
+    rdfs:comment "Records the object label used by perception, simulation, or task documentation."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range xsd:string .
+
+cap:hasPoseFrame a owl:DatatypeProperty ;
+    rdfs:label "has pose frame"@en ;
+    rdfs:comment "Links an ontology individual to a coordinate frame or pose-frame identifier used in perception, reconstruction, or simulation."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range xsd:string .
+
+cap:hasReferenceObject a owl:ObjectProperty ;
+    rdfs:label "has reference object"@en ;
+    rdfs:comment "Relates a task to a physical object used as a spatial or semantic reference."@en ;
+    rdfs:domain cap:Task ;
+    rdfs:range cap:PhysicalObject .
+
+cap:hasTargetObject a owl:ObjectProperty ;
+    rdfs:label "has target object"@en ;
+    rdfs:comment "Relates a task to a physical object that is directly acted upon in that task."@en ;
+    rdfs:domain cap:Task ;
+    rdfs:range cap:PhysicalObject .
+
+cap:hasTaskRole a owl:ObjectProperty ;
+    rdfs:label "has task role"@en ;
+    rdfs:comment "Relates a physical object to the role it plays in a task."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range cap:TaskRole .
+
+cap:EndEffector a owl:Class ;
+    rdfs:label "end effector"@en ;
+    rdfs:comment "A robot component used to physically interact with objects, such as a gripper."@en .
+
+cap:StackabilityAffordance a owl:Class ;
+    rdfs:label "stackability affordance"@en ;
+    rdfs:comment "An affordance by which an object can participate in a stacking relation with another object."@en ;
+    rdfs:subClassOf cap:Affordance .
+
+cap:SupportAffordance a owl:Class ;
+    rdfs:label "support affordance"@en ;
+    rdfs:comment "An affordance by which an object can support the placement or arrangement of other objects."@en ;
+    rdfs:subClassOf cap:Affordance .
+
+cap:ccyont a foaf:Person ;
+    foaf:mbox <mailto:ccy@hptp.org> ;
+    foaf:name "Chun-yien Chang"@en .
+
+g12:hasTaskLevel a owl:ObjectProperty ;
+    rdfs:label "has task level"@en ;
+    rdfs:comment "Relates a physical object to the course task level in which it is used."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range g12:TaskLevel .
+
+cap:CollectableObject a owl:Class ;
+    rdfs:label "collectable object"@en ;
+    rdfs:comment "A task role for an object that should be collected into another object or location."@en ;
+    rdfs:subClassOf cap:TaskRole .
+
+cap:Task a owl:Class ;
+    rdfs:label "task"@en ;
+    rdfs:comment "A goal-directed activity to be performed or evaluated in the course project."@en .
+
+cap:ToyBlock a owl:Class ;
+    rdfs:label "toy block"@en ;
+    rdfs:comment "A small object to be collected into the basket in the toy-block-collection task."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty cap:hasAffordance ;
+            owl:someValuesFrom cap:GraspingAffordance ],
+        cap:PhysicalObject .
+
+cap:Basket a owl:Class ;
+    rdfs:label "basket"@en ;
+    rdfs:comment "A container target used to receive toy blocks in the toy-block-collection task."@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty cap:hasAffordance ;
+            owl:someValuesFrom cap:ContainmentAffordance ],
+        cap:PhysicalObject .
+
+cap:ContainerTarget a owl:Class ;
+    rdfs:label "container target"@en ;
+    rdfs:comment "A task role for an object that receives or contains other objects."@en ;
+    rdfs:subClassOf cap:TaskRole .
+
+g12:EntryLevel a g12:TaskLevel ;
+    rdfs:label "entry level"@en ;
+    rdfs:comment "The entry-level setting of the course project."@en .
+
+g12:TaskLevel a owl:Class ;
+    rdfs:label "task level"@en ;
+    rdfs:comment "A group-specific category describing whether an object is used in the entry-level task, advanced-level task, or both."@en .
+
+cap:Affordance a owl:Class ;
+    rdfs:label "affordance"@en ;
+    rdfs:comment "An action possibility associated with an object in relation to a robot capability and task context."@en .
+
+cap:ContainmentAffordance a owl:Class ;
+    rdfs:label "containment affordance"@en ;
+    rdfs:comment "An affordance by which an object can contain or receive other objects."@en ;
+    rdfs:subClassOf cap:Affordance .
+
+cap:TaskRole a owl:Class ;
+    rdfs:label "task role"@en ;
+    rdfs:comment "A role that an object plays within a task."@en .
+
+g12:AdvancedLevel a g12:TaskLevel ;
+    rdfs:label "advanced level"@en ;
+    rdfs:comment "The advanced-level setting of the course project."@en .
+
+cap:GraspingAffordance a owl:Class ;
+    rdfs:label "grasping affordance"@en ;
+    rdfs:comment "An affordance by which an object may be grasped, held, lifted, or repositioned by a robot gripper."@en ;
+    rdfs:subClassOf cap:Affordance .
+
+cap:hasAffordance a owl:ObjectProperty ;
+    rdfs:label "has affordance"@en ;
+    rdfs:comment "Relates a physical object to an affordance associated with that object in the task context."@en ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range cap:Affordance .
+
+cap:PhysicalObject a owl:Class ;
+    rdfs:label "physical object"@en ;
+    rdfs:comment "A material object in the task environment that may be perceived, manipulated, used as a reference object, or assigned a task role."@en .
+

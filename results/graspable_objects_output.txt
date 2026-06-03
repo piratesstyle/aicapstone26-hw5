@@ -1,0 +1,5 @@
+obj                         | name               | label | role                 
+----------------------------+--------------------+-------+----------------------
+cap:group12/blueToyBlock01  | blue toy block 01  |       | cap:CollectableObject
+cap:group12/greenToyBlock01 | green toy block 01 |       | cap:CollectableObject
+cap:group12/redToyBlock01   | red toy block 01   |       | cap:CollectableObject

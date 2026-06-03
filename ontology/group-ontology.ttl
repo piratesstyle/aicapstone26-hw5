@@ -1,0 +1,138 @@
+@prefix cap: <https://hcis.io/ontology/aicapstone/2026/> .
+@prefix g12: <https://hcis.io/ontology/aicapstone/2026/group12/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+
+g12:TaskLevel
+    a owl:Class ;
+    rdfs:label "task level"@en ;
+    rdfs:comment "A group-specific category describing whether an object is used in the entry-level task, advanced-level task, or both."@en .
+
+g12:LevelQualifiedObject
+    a owl:Class ;
+    rdfs:subClassOf cap:PhysicalObject ;
+    rdfs:label "level-qualified object"@en ;
+    rdfs:comment "A physical object that is associated with at least one task level in the Group 12 task setting."@en ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            cap:PhysicalObject
+            [
+                a owl:Restriction ;
+                owl:onProperty g12:hasTaskLevel ;
+                owl:someValuesFrom g12:TaskLevel
+            ]
+        )
+    ] .
+
+g12:hasTaskLevel
+    a owl:ObjectProperty ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range g12:TaskLevel ;
+    rdfs:label "has task level"@en ;
+    rdfs:comment "Relates a physical object to the course task level in which it is used."@en .
+
+g12:hasSimulationName
+    a owl:DatatypeProperty ;
+    rdfs:domain cap:PhysicalObject ;
+    rdfs:range xsd:string ;
+    rdfs:label "has simulation name"@en ;
+    rdfs:comment "Records the object name used in the group's simulation or data collection environment."@en .
+
+g12:EntryLevel
+    a g12:TaskLevel ;
+    rdfs:label "entry level"@en ;
+    rdfs:comment "The entry-level setting of the course project."@en .
+
+g12:AdvancedLevel
+    a g12:TaskLevel ;
+    rdfs:label "advanced level"@en ;
+    rdfs:comment "The advanced-level setting of the course project."@en .
+
+g12:whiteBasket01
+    a cap:Basket ;
+    rdfs:label "white basket 01"@en ;
+    rdfs:comment "A white basket used as the container target in the entry-level toy-block collection task."@en ;
+    cap:hasColor "white" ;
+    cap:hasObjectLabel "WhiteBasket" ;
+    cap:hasTaskRole cap:ContainerTarget ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasPoseFrame "world/object_white_basket" ;
+    g12:hasTaskLevel g12:EntryLevel ;
+    g12:hasSimulationName "WhiteBasket" .
+
+g12:redBasket01
+    a cap:Basket ;
+    rdfs:label "red basket 01"@en ;
+    rdfs:comment "A red basket used as a container target in the advanced-level toy-block collection task."@en ;
+    cap:hasColor "red" ;
+    cap:hasObjectLabel "RedBasket" ;
+    cap:hasTaskRole cap:ContainerTarget ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasPoseFrame "world/object_red_basket" ;
+    g12:hasTaskLevel g12:AdvancedLevel ;
+    g12:hasSimulationName "RedBasket" .
+
+g12:greenBasket01
+    a cap:Basket ;
+    rdfs:label "green basket 01"@en ;
+    rdfs:comment "A green basket used as a container target in the advanced-level toy-block collection task."@en ;
+    cap:hasColor "green" ;
+    cap:hasObjectLabel "GreenBasket" ;
+    cap:hasTaskRole cap:ContainerTarget ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasPoseFrame "world/object_green_basket" ;
+    g12:hasTaskLevel g12:AdvancedLevel ;
+    g12:hasSimulationName "GreenBasket" .
+
+g12:blueBasket01
+    a cap:Basket ;
+    rdfs:label "blue basket 01"@en ;
+    rdfs:comment "A blue basket used as a container target in the advanced-level toy-block collection task."@en ;
+    cap:hasColor "blue" ;
+    cap:hasObjectLabel "BlueBasket" ;
+    cap:hasTaskRole cap:ContainerTarget ;
+    cap:hasAffordance cap:ContainmentAffordance ;
+    cap:hasPoseFrame "world/object_blue_basket" ;
+    g12:hasTaskLevel g12:AdvancedLevel ;
+    g12:hasSimulationName "BlueBasket" .
+
+g12:redToyBlock01
+    a cap:ToyBlock ;
+    rdfs:label "red toy block 01"@en ;
+    rdfs:comment "A red toy block used as a collectable object in both entry-level and advanced-level toy-block collection tasks."@en ;
+    cap:hasColor "red" ;
+    cap:hasObjectLabel "RedToyBlock" ;
+    cap:hasTaskRole cap:CollectableObject ;
+    cap:hasAffordance cap:GraspingAffordance ;
+    cap:hasPoseFrame "world/object_red_toy_block" ;
+    g12:hasTaskLevel g12:EntryLevel, g12:AdvancedLevel ;
+    g12:hasSimulationName "RedToyBlock" .
+
+g12:greenToyBlock01
+    a cap:ToyBlock ;
+    rdfs:label "green toy block 01"@en ;
+    rdfs:comment "A green toy block used as a collectable object in both entry-level and advanced-level toy-block collection tasks."@en ;
+    cap:hasColor "green" ;
+    cap:hasObjectLabel "GreenToyBlock" ;
+    cap:hasTaskRole cap:CollectableObject ;
+    cap:hasAffordance cap:GraspingAffordance ;
+    cap:hasPoseFrame "world/object_green_toy_block" ;
+    g12:hasTaskLevel g12:EntryLevel, g12:AdvancedLevel ;
+    g12:hasSimulationName "GreenToyBlock" .
+
+g12:blueToyBlock01
+    a cap:ToyBlock ;
+    rdfs:label "blue toy block 01"@en ;
+    rdfs:comment "A blue toy block used as a collectable object in both entry-level and advanced-level toy-block collection tasks."@en ;
+    cap:hasColor "blue" ;
+    cap:hasObjectLabel "BlueToyBlock" ;
+    cap:hasTaskRole cap:CollectableObject ;
+    cap:hasAffordance cap:GraspingAffordance ;
+    cap:hasPoseFrame "world/object_blue_toy_block" ;
+    g12:hasTaskLevel g12:EntryLevel, g12:AdvancedLevel ;
+    g12:hasSimulationName "BlueToyBlock" .
