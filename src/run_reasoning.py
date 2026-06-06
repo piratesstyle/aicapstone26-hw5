@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Set, Tuple
 
-from rdflib import Graph, Namespace, RDF, RDFS, URIRef
+from rdflib import Graph, Namespace, RDF, RDFS, OWL, URIRef, BNode
 from rdflib.query import ResultRow
 
 
@@ -25,6 +24,7 @@ def load_graph() -> Graph:
     graph.bind("g12", G12)
     graph.bind("rdf", RDF)
     graph.bind("rdfs", RDFS)
+    graph.bind("owl", OWL)
 
     if not GROUP_ONTOLOGY.exists():
         raise FileNotFoundError(f"Missing required file: {GROUP_ONTOLOGY}")
@@ -40,24 +40,153 @@ def load_graph() -> Graph:
     return graph
 
 
-def infer_graspable_objects(graph: Graph) -> int:
-    """
-    Rule:
-    (?obj cap:hasAffordance cap:GraspingAffordance)
-        => (?obj rdf:type cap:GraspableObject)
-    """
-    inferred_triples = set()
-
-    for obj in graph.subjects(CAP.hasAffordance, CAP.GraspingAffordance):
-        inferred_triples.add((obj, RDF.type, CAP.GraspableObject))
-
+def add_new_triples(graph: Graph, triples: Set[Tuple]) -> int:
     added_count = 0
-    for triple in inferred_triples:
+
+    for triple in triples:
         if triple not in graph:
             graph.add(triple)
             added_count += 1
 
     return added_count
+
+
+def infer_subclass_types(graph: Graph) -> int:
+    """
+    RDFS subclass rule:
+    If x rdf:type C and C rdfs:subClassOf D, infer x rdf:type D.
+    """
+    inferred = set()
+
+    for instance, cls in graph.subject_objects(RDF.type):
+        if isinstance(instance, BNode):
+            continue
+
+        for superclass in graph.objects(cls, RDFS.subClassOf):
+            if isinstance(superclass, URIRef):
+                inferred.add((instance, RDF.type, superclass))
+
+    return add_new_triples(graph, inferred)
+
+
+def infer_existential_restrictions(graph: Graph) -> int:
+    """
+    OWL restriction rule for the homework pattern:
+    If C rdfs:subClassOf [
+        owl:onProperty P ;
+        owl:someValuesFrom V
+    ],
+    and x rdf:type C,
+    infer x P V.
+    """
+    inferred = set()
+
+    for cls, restriction in graph.subject_objects(RDFS.subClassOf):
+        if not isinstance(restriction, BNode):
+            continue
+
+        properties = list(graph.objects(restriction, OWL.onProperty))
+        values = list(graph.objects(restriction, OWL.someValuesFrom))
+
+        if not properties or not values:
+            continue
+
+        for prop in properties:
+            for value_cls in values:
+                for instance in graph.subjects(RDF.type, cls):
+                    if isinstance(instance, BNode):
+                        continue
+                    inferred.add((instance, prop, value_cls))
+
+    return add_new_triples(graph, inferred)
+
+
+def is_subclass_or_self(graph: Graph, cls: URIRef, target: URIRef) -> bool:
+    """
+    Return True if cls == target or cls is connected to target by rdfs:subClassOf*.
+    """
+    if cls == target:
+        return True
+
+    visited = set()
+    stack = [cls]
+
+    while stack:
+        current = stack.pop()
+
+        if current in visited:
+            continue
+        visited.add(current)
+
+        for superclass in graph.objects(current, RDFS.subClassOf):
+            if superclass == target:
+                return True
+            if isinstance(superclass, URIRef):
+                stack.append(superclass)
+
+    return False
+
+
+def infer_graspable_objects(graph: Graph) -> int:
+    """
+    Graspability classification rule:
+    If x is a cap:PhysicalObject, and x cap:hasAffordance A,
+    where A is cap:GraspingAffordance or a subclass of it,
+    infer x rdf:type cap:GraspableObject.
+    """
+    inferred = set()
+
+    for obj in graph.subjects(RDF.type, CAP.PhysicalObject):
+        for affordance in graph.objects(obj, CAP.hasAffordance):
+            if isinstance(affordance, URIRef) and is_subclass_or_self(
+                graph,
+                affordance,
+                CAP.GraspingAffordance,
+            ):
+                inferred.add((obj, RDF.type, CAP.GraspableObject))
+
+    return add_new_triples(graph, inferred)
+
+
+def infer_level_qualified_objects(graph: Graph) -> int:
+    """
+    Group-specific inference:
+    If x is a cap:PhysicalObject and x g12:hasTaskLevel L,
+    where L rdf:type g12:TaskLevel, infer x rdf:type g12:LevelQualifiedObject.
+    """
+    inferred = set()
+
+    for obj in graph.subjects(RDF.type, CAP.PhysicalObject):
+        for level in graph.objects(obj, G12.hasTaskLevel):
+            if (level, RDF.type, G12.TaskLevel) in graph:
+                inferred.add((obj, RDF.type, G12.LevelQualifiedObject))
+
+    return add_new_triples(graph, inferred)
+
+
+def run_inference(graph: Graph, max_iterations: int = 20) -> int:
+    """
+    Run inference rules until no new triples are added.
+    """
+    total_added = 0
+
+    for iteration in range(1, max_iterations + 1):
+        added_this_round = 0
+
+        added_this_round += infer_subclass_types(graph)
+        added_this_round += infer_existential_restrictions(graph)
+        added_this_round += infer_graspable_objects(graph)
+        added_this_round += infer_level_qualified_objects(graph)
+
+        print(f"[Inference] Iteration {iteration}: added {added_this_round} triple(s).")
+        total_added += added_this_round
+
+        if added_this_round == 0:
+            break
+    else:
+        print("[Warning] Inference stopped because max_iterations was reached.")
+
+    return total_added
 
 
 def save_inferred_graph(graph: Graph) -> None:
@@ -83,14 +212,14 @@ def shorten(value) -> str:
 def format_query_results(rows: Iterable[ResultRow]) -> str:
     rows = list(rows)
 
-    headers = ["obj", "name", "label", "role"]
+    headers = ["obj", "name", "objectLabel", "role"]
     data = []
 
     for row in rows:
         data.append([
             shorten(getattr(row, "obj", None)),
             shorten(getattr(row, "name", None)),
-            shorten(getattr(row, "label", None)),
+            shorten(getattr(row, "objectLabel", None)),
             shorten(getattr(row, "role", None)),
         ])
 
@@ -135,9 +264,9 @@ def main() -> None:
     graph = load_graph()
     print(f"[OK] Loaded graph with {len(graph)} triples.")
 
-    print("[Step 2] Running lightweight graspability inference...")
-    added_count = infer_graspable_objects(graph)
-    print(f"[OK] Added {added_count} inferred cap:GraspableObject triple(s).")
+    print("[Step 2] Running OWL/RDFS-style lightweight inference...")
+    added_count = run_inference(graph)
+    print(f"[OK] Added {added_count} inferred triple(s) in total.")
 
     print("[Step 3] Saving inferred graph...")
     save_inferred_graph(graph)
